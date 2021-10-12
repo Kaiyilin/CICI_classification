@@ -5,31 +5,21 @@ import argparse
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from tensorflow.python.keras.backend import mean
-from dataloader.dataloader import ds
 from configs import pjt_config
+from dataloader.dataloader import ds
+from tensorflow.python.keras.backend import mean
+from utils.augmentation import tf_random_rotate_image
 from c_models.resnet3dse_swish import ResnetSE3DBuilder_swish
 from basicTools.classVisualisation import IntegratedGradients
-
-
-# one axes random rotation
-def tf_random_rotate_image(image, label):
-    def random_rotate_image(image):
-        image = scipy.ndimage.rotate(image, np.random.uniform(-80, 80), order=0, reshape=False)
-        return image
-    im_shape = image.shape
-    [image,] = tf.py_function(random_rotate_image, [image], [tf.float64])
-    image.set_shape(im_shape)
-    return image, label
 
 
 def main():
     parser = argparse.ArgumentParser()
     # Add '--image_folder' argument using add_argument() including a help. The type is string (by default):
-    parser.add_argument('--log_output_path', type=str, default=None)
-    parser.add_argument('--checkpoint_folder', type=str, default=None)
-    parser.add_argument('--visualisation', type=bool, default=False)
-    parser.add_argument('--opt', type=int, default=0)
+    parser.add_argument('--log_path', type=str, default=pjt_config["path"]["logs"], help="path for logs")
+    parser.add_argument('--checkpoint_folder', type=str, default=pjt_config["path"]["ckpt_dir"], help="path for ckpt")
+    parser.add_argument('--visualisation', type=bool, default=False, help="True or False, if True, plot integrated gradients")
+    parser.add_argument('--opt', type=int, default=0, help="choose the optimiser you want, 1 for adam, 2 for rmsprop the rest for SGD")
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--batchsize', type=int, default=5)
     parser.add_argument('--epochs', type=int, default=250)
@@ -41,7 +31,8 @@ def main():
 
 
     # tensorboard log directiory
-    logdir = args["log_output_path"] + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    logdir = args["log_path"] + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
     # model checkpoint
     checkpoint_dir = args["checkpoint_folder"] + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     checkpoint_prefix = os.path.join(checkpoint_dir, "weights-{epoch:02d}.hdf5")
@@ -105,12 +96,13 @@ def main():
             )
 
     if args["visualisation"]:
+        vis_dir = logdir + "/vis/"
         ig_result = IntegratedGradients(model=model, dataset=ds, target_index=1)
         ig_result = ig_result.calculate_IG(img_shape=pjt_config["model"]["input_fmri"], m_steps=50)
         mean_ig_result = np.arange(ig_result, axis=0)
         for i in range(mean_ig_result.shape[3]):
             plt.imshow(mean_ig_result[:, :, i])
-            plt.savefig(f"vis_{i+1}.png")
+            plt.savefig(os.path.join(vis_dir, f"vis_{i+1}.png"))
             plt.axis("off")
             plt.close()
     

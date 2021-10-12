@@ -6,21 +6,6 @@ import nibabel as nib
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from tensorflow.keras.models import Model, 
-from tensorflow.keras.regularizers import l1_l2 
-from tensorflow.keras.layers import (
-    Input, 
-    Dense, 
-    Dropout, 
-    Flatten, 
-    Activation, 
-    BatchNormalization,
-    Conv3D, 
-    MaxPooling3D, 
-    Dropout, 
-    AveragePooling3D, 
-    GlobalAveragePooling3D)
-
 print('\nImport completed')
 
 

@@ -46,16 +46,16 @@ class Data(object):
         array_val = array[:c,:,:,:]
         array_tr = array[c:,:,:,:]
         return array_tr, array_val
+    
     # Read files
-    def get_image_data(dirr, pad_func= False,  pre_func = None):
+    def get_image_data(dirr, pad_func=False,  pre_func=None):
         """
-        This version can import 3D array regardless of the size
+        if not from database, obtain image data from a given dir
         """
-        #cwd = os.getcwd()
         array_list = []
         imgs_array = np.array([])
         path_list=[f for f in os.listdir(dirr) if not f.startswith('.')]
-        path_list.sort() #對讀取的路徑進行排序
+        path_list.sort() 
         #print(path_list)
         for file in path_list:
             if file.endswith(".nii"):
