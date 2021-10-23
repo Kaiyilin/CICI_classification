@@ -1,7 +1,7 @@
 # Project 1: Classification and visualisation of chemotherapy induced cognitive impairment in Volumetric Convolutional Neural Network     
 
 Chemotherapy induced cognitive impairment is the common side effect for cancer survivors who undergone chemotherapy. </br>
-In this project, I tried to differenciate the CICI from healthy participants.
+In this project, I tried to differenciate the CICI from healthy participants. This project is published in [here](https://www.mdpi.com/2075-4426/11/10/1025).
 
 ### Phase 1: Check the image data
 
