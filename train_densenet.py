@@ -9,18 +9,20 @@ from configs import pjt_config
 from dataloader.dataloader import ds
 from tensorflow.python.keras.backend import mean
 from utils.augmentation import tf_random_rotate_image
-from c_models.resnet3dse_swish import ResnetSE3DBuilder_swish
+from c_models.densenet3d import DenseNet3Dbuilder
 from basicTools.classVisualisation import IntegratedGradients
 
 
-def main():
+def train_densenet():
     parser = argparse.ArgumentParser()
     # Add '--image_folder' argument using add_argument() including a help. The type is string (by default):
     parser.add_argument('--log_path', type=str, default=pjt_config["path"]["logs"], help="path for logs")
     parser.add_argument('--checkpoint_folder', type=str, default=pjt_config["path"]["ckpt_dir"], help="path for ckpt")
     parser.add_argument('--visualisation', type=bool, default=False, help="True or False, if True, plot integrated gradients")
+    parser.add_argument('--k', type=int, default=8, help="growth rate for densenet")
+    parser.add_argument('--bttn_ratio', type=int, default=4, help="bottleneck ratio for densenet")
     parser.add_argument('--opt', type=int, default=0, help="choose the optimiser you want, 1 for adam, 2 for rmsprop the rest for SGD")
-    parser.add_argument('--lr', type=float, default=1e-3, help="learning rate")
+    parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--batchsize', type=int, default=5)
     parser.add_argument('--epochs', type=int, default=250)
     parser.add_argument('--num_classes', type=int, default=3)
@@ -55,9 +57,11 @@ def main():
 
     with strategy.scope():
 
-        model = ResnetSE3DBuilder_swish.build_resnet_50(
+        model = DenseNet3Dbuilder.build_densenet_121(
             input_shape=pjt_config["model"]["input_fmri"], 
-            num_outputs=args["num_classes"]
+            n_classes=args["num_classes"],
+            growth_rate=args["k"],
+            bottleneck_ratio=args["bttn_ratio"],
             )
 
         model.compile(
@@ -112,4 +116,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    train_densenet()
